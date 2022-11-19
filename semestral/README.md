@@ -1,6 +1,6 @@
 # Nonogram
 
-Semestrální práce implementuje známou *puzzle* hru [Nonogram](https://en.wikipedia.org/wiki/Nonogram), spočívající v obarvování bílé mřížky na základě zadaných instrukcí. Hra bude implementována za pomocí knihovny `pyglet` (**WIP**), která se bude starat o vykreslování GUI. Hra bude mít uložené jednotlivé hádanky v podobě textového souboru, kde bude zapsaná velikost a čísla u daných řádků/sloupců. Po načtení do paměti bude hádanka (zadaná čísla i hrací plocha) reprezentována pomocí několika `numpy array` (**WIP**).
+Semestrální práce implementuje známou *puzzle* hru [Nonogram](https://en.wikipedia.org/wiki/Nonogram), spočívající v obarvování bílé mřížky na základě zadaných instrukcí. Hra bude implementována za pomocí knihovny `pygame`, která se bude starat o vykreslování GUI. Hra bude mít uložené jednotlivé hádanky v podobě textového souboru, kde bude zapsaná velikost a čísla u daných řádků/sloupců. Po načtení do paměti bude hádanka (zadaná čísla i hrací plocha) reprezentována pomocí několika `numpy array` (**WIP**).
 
 Během řešení hádanky bude hráč mít ve hře zapnutou časomíru (volitelná feature), která si uloží jeho výsledný čas potřebný k vyřešení hádanky. Díky tomu bude možné ke každé hádance vytvořit **tabulku nejrychlejších řešitelů** (pro podpoření soutěživosti se sebou samým/s jiným lokálním hráčem), případně čas přepočítat na skóre a to střádat na "profilu hráče".
 
