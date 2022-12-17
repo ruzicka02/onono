@@ -1,6 +1,7 @@
 import numpy as np
 import pygame as pg
 
+
 def run():
     pg.init()
     screen = pg.display.set_mode([500, 500])
