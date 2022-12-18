@@ -37,7 +37,6 @@ def run():
 
     pg.font.init()
     font = pg.font.Font(FONT_NAME, 50)
-    font_mono = pg.font.Font(FONT_NAME_MONO, 50)
 
     event_data = {
         "running": True,
@@ -45,10 +44,10 @@ def run():
         "screen": screen
     }
 
-    # todo... can be replaced with pg.time
-    start_time = datetime.now()
-
     while event_data["running"]:
+        # sets the game to 30 FPS... sleep for 33 ms
+        pg.time.wait(33)
+
         get_events(event_data)
 
         screen.fill(COLOR["background"])
@@ -58,17 +57,10 @@ def run():
 
         draw_game(screen, game)
 
-        time_sec = (datetime.now() - start_time).seconds
-        time_text = font_mono.render(f"{time_sec // 60:02d}:{time_sec % 60:02d}", 1, False)
-        time_pos = np.array([SCREEN_SIZE[0] - font_mono.size("00:00  ")[0], 10])
-        screen.blit(time_text, time_pos)
+        draw_timer(screen)
 
         # refresh screen
         pg.display.flip()
-
-        # do not refresh if no click happens
-        # todo... can possibly be further optimized
-        pg.event.wait(timeout=1)
 
     pg.quit()
 
@@ -86,9 +78,20 @@ def get_events(data: dict):
     for event in pg.event.get():
         if event.type == pg.QUIT:
             data["running"] = False
+        if event.type == pg.MOUSEBUTTONUP:
+            handle_click(event, data["game"])
 
-    # todo... resolve mouse events
-    # pg.mouse.get_pressed(num_buttons=3) -> (button1, button2, button3)
+
+def handle_click(click: pg.event.Event, game: savegame.SaveGame):
+    pos = np.array(click.__dict__["pos"])
+    pos = (pos - INITIAL_COORDS) // BLOCK_SIZE
+
+    button = click.__dict__["button"]
+    print(pos, button)
+
+    dims = game.board.shape
+    if pos[0] in range(dims[0]) and pos[1] in range(dims[1]):
+        gamelogic.change_field(game, pos, button)
 
 
 def draw_game(screen: pg.Surface, game: savegame.SaveGame):
@@ -136,3 +139,12 @@ def draw_vector(coords: np.ndarray, lengths: list, screen: pg.Surface, vertical:
             coords += delta
         num_surface = font.render(str(num), 1, False)
         screen.blit(num_surface, list(coords))
+
+
+def draw_timer(screen: pg.Surface):
+    font_mono = pg.font.Font(FONT_NAME_MONO, 50)
+
+    time_sec = pg.time.get_ticks() // 1000
+    time_text = font_mono.render(f"{time_sec // 60:02d}:{time_sec % 60:02d}", 1, False)
+    time_pos = np.array([SCREEN_SIZE[0] - font_mono.size("00:00  ")[0], 10])
+    screen.blit(time_text, time_pos)
