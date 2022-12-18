@@ -8,9 +8,9 @@ class SaveGame:
     """
     def __init__(self, dims: tuple = (5, 5)):
         self.board = np.zeros(dims, bool)
-        self.x = np.zeros(dims[0], int)
-        self.y = np.zeros(dims[0], int)
-        self.calculate_sums()
+        self.x = np.array([0])
+        self.y = np.array([0])
+        self.overwrite_lengths()
 
     def load_game(self, name: str) -> bool:
         """
@@ -20,7 +20,7 @@ class SaveGame:
         path = (path / 'saves' / name).resolve()
         try:
             self.board = np.loadtxt(path, dtype=bool, delimiter=',')
-            self.calculate_sums()
+            self.overwrite_lengths()
             return True
         except FileNotFoundError:
             return False
@@ -36,21 +36,43 @@ class SaveGame:
         # noinspection PyTypeChecker
         np.savetxt(path, X=self.board, fmt='%.0d', delimiter=',')
 
-    def calculate_sums(self):
+    def calculate_lengths(self, transposed: bool):
         """
-        Calculates and overwrites the sums at x and y axis on the board.
+        Calculates and overwrites the lengths at x or y-axis on the board.
+
+        Returns a list of lists due to varying lengths.
         """
-        self.x = self.board.sum(axis=0)
-        self.y = self.board.sum(axis=1)
-        return self.x, self.y
+        board = self.board.transpose() if transposed else self.board
+        result = []
+
+        for row in board:
+            counter = 0
+            row_vector = []
+
+            for pos in row:
+                if pos:
+                    counter += 1
+                elif counter > 0:
+                    row_vector.append(counter)
+                    counter = 0
+
+            if len(row_vector) == 0 or counter != 0:
+                row_vector.append(counter)  # will be last number or 0
+            result.append(row_vector)
+
+        return result
+
+    def overwrite_lengths(self):
+        self.x = self.calculate_lengths(True)
+        self.y = self.calculate_lengths(False)
 
     def randomize(self, prob: float = 0.5):
         """
         Randomizes the board while keeping the same dimensions. Optional parameter of probability of any field
         being True (between 0 and 1).
         """
-        assert(0 <= prob <= 1, "Probability parameter not in range <0, 1>")
+        assert 0 <= prob <= 1, "Probability parameter not in range <0, 1>"
         dims = self.board.shape
         self.board = np.random.rand(*dims) < prob
 
-        self.calculate_sums()
+        self.overwrite_lengths()

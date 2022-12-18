@@ -117,3 +117,6 @@ dmypy.json
 
 # IDE
 .idea/
+
+# semestral
+semestral/saves/
