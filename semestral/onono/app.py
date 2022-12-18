@@ -2,7 +2,10 @@ import numpy as np
 import pygame as pg
 from datetime import datetime
 
-import savegame
+if __package__ == "":
+    import savegame, gamelogic
+else:
+    from . import savegame, gamelogic
 
 COLOR = {
     "background": "#FFFFFF",
