@@ -1,5 +1,6 @@
 import numpy as np
 import pygame as pg
+from datetime import datetime
 
 import savegame
 
@@ -11,22 +12,32 @@ COLOR = {
 }
 
 FONT_NAME = pg.font.get_default_font()
+try:
+    FONT_NAME_MONO = pg.font.match_font("notomono")
+except:
+    FONT_NAME_MONO = FONT_NAME
 
-BLOCK_SIZE = (40, 40)
-INITIAL_COORDS = [70., 120.]
+
+BLOCK_SIZE = (45, 45)
+INITIAL_COORDS = [110., 210.]
+SCREEN_SIZE = [600, 700]
+
 
 def run():
     game = prepare_game()
 
     pg.init()
-    screen = pg.display.set_mode([500, 550])
-    pg.display.set_caption("Onono!")
+    screen = pg.display.set_mode(SCREEN_SIZE)
+    pg.display.set_caption("Onono! The Puzzle Game")
 
     pg.font.init()
-    font = pg.font.SysFont(FONT_NAME, 50)
+    font = pg.font.Font(FONT_NAME, 50)
+    font_mono = pg.font.Font(FONT_NAME_MONO, 50)
 
     # Run until the user asks to quit
     running = True
+
+    start_time = datetime.now()
 
     while running:
         for event in pg.event.get():
@@ -35,10 +46,15 @@ def run():
 
         screen.fill(COLOR["background"])
 
-        header_text = font.render("Onono! The Puzzle Game", 1, False)
+        header_text = font.render("Onono!", 1, False)
         screen.blit(header_text, (50, 20))
 
         draw_game(screen, game)
+
+        time_sec = (datetime.now() - start_time).seconds
+        time_text = font_mono.render(f"{time_sec // 60:02d}:{time_sec % 60:02d}", 1, False)
+        time_pos = np.array([SCREEN_SIZE[0] - font_mono.size("00:00  ")[0], 10])
+        screen.blit(time_text, time_pos)
 
         # refresh screen
         pg.display.flip()
@@ -83,12 +99,14 @@ def draw_game(screen: pg.Surface, game: savegame.SaveGame):
 
 
 def draw_vector(coords: np.ndarray, lengths: list, screen: pg.Surface, vertical: bool):
-    font = pg.font.SysFont(FONT_NAME, 20)
-    delta = np.array([0., -0.33]) if vertical else np.array([-0.3, 0.])
-    delta *= BLOCK_SIZE
+    font = pg.font.Font(FONT_NAME_MONO, 15)
+    delta = np.array([0., -font.get_linesize()]) if vertical else np.array([-font.size("10")[0], 0.])
 
     for num in lengths[::-1]:
-        coords += delta
+        if num >= 10 and not vertical:
+            coords += 1.3 * delta
+        else:
+            coords += delta
         num_surface = font.render(str(num), 1, False)
         screen.blit(num_surface, list(coords))
 
