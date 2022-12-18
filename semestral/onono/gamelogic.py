@@ -1,8 +1,10 @@
 import numpy as np
 
 if __package__ == "":
+    # when imported from __main__
     import savegame
 else:
+    # when imported from __init__
     from . import savegame
 
 

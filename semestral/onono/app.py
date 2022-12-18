@@ -1,10 +1,12 @@
 import numpy as np
 import pygame as pg
-from datetime import datetime
 
 if __package__ == "":
-    import savegame, gamelogic
+    # when imported from __main__
+    import savegame
+    import gamelogic
 else:
+    # when imported from __init__
     from . import savegame, gamelogic
 
 COLOR = {
@@ -40,6 +42,8 @@ def run():
 
     event_data = {
         "running": True,
+        "mouse_button": None,
+        "last_position": np.array([-1, -1]),
         "game": game,
         "screen": screen
     }
@@ -75,23 +79,39 @@ def prepare_game() -> savegame.SaveGame:
 
 
 def get_events(data: dict):
+    mouse_event = None
     for event in pg.event.get():
         if event.type == pg.QUIT:
             data["running"] = False
-        if event.type == pg.MOUSEBUTTONUP:
-            handle_click(event, data["game"])
+        if event.type == pg.MOUSEBUTTONDOWN and event.__dict__["button"] in [1, 3]:
+            data["mouse_button"] = event.__dict__["button"]
+            mouse_event = event
+        if event.type == pg.MOUSEMOTION:
+            mouse_event = event
+        if event.type == pg.MOUSEBUTTONUP and event.__dict__["button"] in [1, 3]:
+            data["mouse_button"] = None
+            data["last_position"] = np.array([-1, -1])
+
+        if data["mouse_button"] is not None and mouse_event is not None:
+            handle_click(mouse_event, data)
 
 
-def handle_click(click: pg.event.Event, game: savegame.SaveGame):
+def handle_click(click: pg.event.Event, data: dict):
     pos = np.array(click.__dict__["pos"])
     pos = (pos - INITIAL_COORDS) // BLOCK_SIZE
 
-    button = click.__dict__["button"]
+    print(pos, data["last_position"])
+    if (pos == data["last_position"]).sum() == 2:
+        return
+    else:
+        data["last_position"] = pos
+
+    button = data["mouse_button"]
     print(pos, button)
 
-    dims = game.board.shape
+    dims = data["game"].board.shape
     if pos[0] in range(dims[0]) and pos[1] in range(dims[1]):
-        gamelogic.change_field(game, pos, button)
+        gamelogic.change_field(data["game"], pos, button)
 
 
 def draw_game(screen: pg.Surface, game: savegame.SaveGame):
