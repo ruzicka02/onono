@@ -21,3 +21,19 @@ def change_field(game: savegame.SaveGame, pos: np.ndarray, button: int):
         game.guesses[row, col] = 2 if current_state != 2 else 0
     else:
         game.guesses[row, col] = 1 if current_state != 1 else 0
+
+
+def validate_game(game: savegame.SaveGame) -> bool:
+    reference = game.get_solution(False)
+    solution = game.guesses.copy()
+
+    # replace all `no guess` (0) to `X` (1)
+    solution[solution == 0] = 1
+
+    # quick check... equality
+    if np.array_equal(reference, solution):
+        return True
+
+    # todo... step by step checking
+
+    return False

@@ -82,8 +82,14 @@ class SaveGame:
 
         self.overwrite_lengths()
 
-    def show_solution(self):
+    def get_solution(self, overwrite: bool = False):
         """
-        Takes the correct solution and inserts it into the matrix of guesses.
+        Takes the correct solution and converts it into format of matrix of guesses. If the overwrite parameter
+        is set as `True`, the result overwrites the current guesses inside the object.
         """
-        self.guesses = 1 + self.board
+        guesses = 1 + self.board
+
+        if overwrite:
+            self.guesses = guesses
+
+        return guesses

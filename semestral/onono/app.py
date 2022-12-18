@@ -42,6 +42,7 @@ def run():
 
     event_data = {
         "running": True,
+        "win": False,
         "mouse_button": None,
         "last_position": np.array([-1, -1]),
         "game": game,
@@ -54,13 +55,16 @@ def run():
 
         get_events(event_data)
 
-        screen.fill(COLOR["background"])
+        if gamelogic.validate_game(game):
+            draw_game(screen, game)
+            end_game(screen)
+            return
 
-        header_text = font.render("Onono!", 1, False)
+        screen.fill(COLOR["background"])
+        header_text = font.render("Onono!", 1, COLOR["full"], COLOR["background"])
         screen.blit(header_text, (50, 20))
 
         draw_game(screen, game)
-
         draw_timer(screen)
 
         # refresh screen
@@ -100,7 +104,10 @@ def handle_click(click: pg.event.Event, data: dict):
     pos = np.array(click.__dict__["pos"])
     pos = (pos - INITIAL_COORDS) // BLOCK_SIZE
 
-    print(pos, data["last_position"])
+    # fixme... solves the game
+    if pos[0] == pos[1] == -1:
+        data["game"].get_solution(True)
+
     if (pos == data["last_position"]).sum() == 2:
         return
     else:
@@ -168,3 +175,13 @@ def draw_timer(screen: pg.Surface):
     time_text = font_mono.render(f"{time_sec // 60:02d}:{time_sec % 60:02d}", 1, False)
     time_pos = np.array([SCREEN_SIZE[0] - font_mono.size("00:00  ")[0], 10])
     screen.blit(time_text, time_pos)
+
+
+def end_game(screen: pg.Surface):
+    font = pg.font.Font(FONT_NAME, 75)
+
+    win_text = font.render("Winner!", 1, COLOR["full"], COLOR["background"])
+    screen.blit(win_text, (180, 300))
+    pg.display.flip()
+    pg.time.wait(2500)
+    pg.quit()
