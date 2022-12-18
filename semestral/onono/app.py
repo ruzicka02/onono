@@ -8,7 +8,8 @@ COLOR = {
     "background": "#FFFFFF",
     "empty": "#AAAAAA",
     "full": "#F0AB00",
-    "text": "#000000"
+    "x-placeholder": "#000000",
+    "black": "#000000"
 }
 
 FONT_NAME = pg.font.get_default_font()
@@ -18,7 +19,8 @@ except:
     FONT_NAME_MONO = FONT_NAME
 
 
-BLOCK_SIZE = (45, 45)
+BLOCK_SIZE = np.array([45., 45.])
+BLOCK_MARGIN = np.array([1., 1.])
 INITIAL_COORDS = [110., 210.]
 SCREEN_SIZE = [600, 700]
 
@@ -34,15 +36,17 @@ def run():
     font = pg.font.Font(FONT_NAME, 50)
     font_mono = pg.font.Font(FONT_NAME_MONO, 50)
 
-    # Run until the user asks to quit
-    running = True
+    event_data = {
+        "running": True,
+        "game": game,
+        "screen": screen
+    }
 
+    # todo... can be replaced with pg.time
     start_time = datetime.now()
 
-    while running:
-        for event in pg.event.get():
-            if event.type == pg.QUIT:
-                running = False
+    while event_data["running"]:
+        get_events(event_data)
 
         screen.fill(COLOR["background"])
 
@@ -59,6 +63,10 @@ def run():
         # refresh screen
         pg.display.flip()
 
+        # do not refresh if no click happens
+        # todo... can possibly be further optimized
+        pg.event.wait(timeout=1)
+
     pg.quit()
 
 
@@ -71,6 +79,15 @@ def prepare_game() -> savegame.SaveGame:
     return s
 
 
+def get_events(data: dict):
+    for event in pg.event.get():
+        if event.type == pg.QUIT:
+            data["running"] = False
+
+    # todo... resolve mouse events
+    # pg.mouse.get_pressed(num_buttons=3) -> (button1, button2, button3)
+
+
 def draw_game(screen: pg.Surface, game: savegame.SaveGame):
     dims = game.board.shape
     assert len(dims) == 2, "Board has to be a 2D array."
@@ -78,13 +95,20 @@ def draw_game(screen: pg.Surface, game: savegame.SaveGame):
 
     coords = list(INITIAL_COORDS)  # creates a copy
 
-    for row, lengths in zip(game.board, game.y):
+    for row, lengths in zip(game.guesses, game.y):
         lengths_coords = (coords[0], coords[1] + (0.4 * BLOCK_SIZE[1]))
         draw_vector(np.array(lengths_coords), lengths, screen, False)
 
         for pos in row:
-            color = COLOR["full"] if pos else COLOR["empty"]
-            pg.draw.rect(screen, color, (*coords, *BLOCK_SIZE))
+            pg.draw.rect(screen, COLOR["black"], (*(coords - BLOCK_MARGIN), *(BLOCK_SIZE + 2 * BLOCK_MARGIN)))
+
+            if pos == 0:
+                color = COLOR["empty"]
+            elif pos == 1:
+                color = COLOR["x-placeholder"]
+            else:
+                color = COLOR["full"]
+            pg.draw.rect(screen, color, (*(coords + BLOCK_MARGIN), *(BLOCK_SIZE - 2 * BLOCK_MARGIN)))
             coords[0] += BLOCK_SIZE[0]
 
         coords[0] = INITIAL_COORDS[0]  # CR
@@ -109,4 +133,3 @@ def draw_vector(coords: np.ndarray, lengths: list, screen: pg.Surface, vertical:
             coords += delta
         num_surface = font.render(str(num), 1, False)
         screen.blit(num_surface, list(coords))
-

@@ -8,8 +8,10 @@ class SaveGame:
     """
     def __init__(self, dims: tuple = (5, 5)):
         self.board = np.zeros(dims, bool)
+        self.guesses = np.zeros(dims, int)  # 0 => empty; 1 => X; 2 => full
         self.x = np.array([0])
         self.y = np.array([0])
+
         self.overwrite_lengths()
 
     def load_game(self, name: str) -> bool:
@@ -63,6 +65,9 @@ class SaveGame:
         return result
 
     def overwrite_lengths(self):
+        """
+        Uses `calculate_lengths` to set both x and y-axis length vectors.
+        """
         self.x = self.calculate_lengths(True)
         self.y = self.calculate_lengths(False)
 
@@ -76,3 +81,9 @@ class SaveGame:
         self.board = np.random.rand(*dims) < prob
 
         self.overwrite_lengths()
+
+    def show_solution(self):
+        """
+        Takes the correct solution and inserts it into the matrix of guesses.
+        """
+        self.guesses = 1 + self.board
