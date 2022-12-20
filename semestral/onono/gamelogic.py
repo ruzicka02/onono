@@ -34,6 +34,30 @@ def validate_game(game: savegame.SaveGame) -> bool:
     if np.array_equal(reference, solution):
         return True
 
-    # todo... step by step checking
+    # check by iterating the matrix
+    dims = solution.shape
+    is_correct = True
+
+    for row, i in zip(solution, range(dims[0])):
+        row_complete = validate_row(row, game.y[i])
+        is_correct = row_complete and is_correct  # one False will set is_correct = False
+
+        game.y[i] = game.y[i][0], row_complete  # overwrite in case this was not fulfilled before
+
+    for col, i in zip(solution.T, range(dims[1])):
+        col_complete = validate_row(col, game.x[i])
+        is_correct = col_complete and is_correct
+
+        game.x[i] = game.x[i][0], col_complete
+
+    return is_correct
+
+
+def validate_row(row: np.ndarray, hints: tuple):
+    vector, complete = hints
+
+    vector_guess = savegame.vector_to_hints(row - 1)
+    if np.array_equal(vector, vector_guess):
+        return True
 
     return False

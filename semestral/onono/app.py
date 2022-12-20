@@ -114,7 +114,9 @@ def handle_click(click: pg.event.Event, data: dict):
         data["last_position"] = pos
 
     button = data["mouse_button"]
-    print(pos, button)
+
+    # debug data... logging clicks to terminal
+    # print(pos, button)
 
     dims = data["game"].board.shape
     if pos[0] in range(dims[0]) and pos[1] in range(dims[1]):
@@ -155,16 +157,18 @@ def draw_game(screen: pg.Surface, game: savegame.SaveGame):
         coords[1] = list(INITIAL_COORDS)[1]
 
 
-def draw_vector(coords: np.ndarray, lengths: list, screen: pg.Surface, vertical: bool):
+def draw_vector(coords: np.ndarray, vector: (list, bool), screen: pg.Surface, vertical: bool):
+    text, complete = vector
     font = pg.font.Font(FONT_NAME_MONO, 15)
+    color = COLOR["full"] if complete else COLOR["black"]
     delta = np.array([0., -font.get_linesize()]) if vertical else np.array([-font.size("10")[0], 0.])
 
-    for num in lengths[::-1]:
+    for num in text[::-1]:
         if num >= 10 and not vertical:
             coords += 1.3 * delta
         else:
             coords += delta
-        num_surface = font.render(str(num), 1, False)
+        num_surface = font.render(str(num), True, color)
         screen.blit(num_surface, list(coords))
 
 

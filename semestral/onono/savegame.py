@@ -9,8 +9,8 @@ class SaveGame:
     def __init__(self, dims: tuple = (10, 10)):
         self.board = np.zeros(dims, bool)
         self.guesses = np.zeros(dims, int)  # 0 => empty; 1 => X; 2 => full
-        self.x = np.array([0])
-        self.y = np.array([0])
+        self.x = []  # list of row vectors and whether the guesses are complete
+        self.y = []  # eg. [([1, 2, 3], False), ([10], True), ([0], True)]
 
         self.overwrite_lengths()
 
@@ -50,19 +50,8 @@ class SaveGame:
         result = []
 
         for row in board:
-            counter = 0
-            row_vector = []
-
-            for pos in row:
-                if pos:
-                    counter += 1
-                elif counter > 0:
-                    row_vector.append(counter)
-                    counter = 0
-
-            if len(row_vector) == 0 or counter != 0:
-                row_vector.append(counter)  # will be last number or 0
-            result.append(row_vector)
+            hints = vector_to_hints(row)
+            result.append((hints, hints == [0]))
 
         return result
 
@@ -95,3 +84,25 @@ class SaveGame:
             self.guesses = guesses
 
         return guesses
+
+
+def vector_to_hints(vector: np.ndarray) -> list:
+    """
+    Takes an array of numbers and converts it into a list of hints.
+    """
+    counter = 0
+    row_vector = []
+
+    for pos in vector:
+        if pos:
+            counter += 1
+        elif counter > 0:
+            row_vector.append(counter)
+            counter = 0
+
+    if len(row_vector) == 0 and counter == 0:
+        row_vector.append(0)  # no numbers in row/column
+    elif counter != 0:
+        row_vector.append(counter)  # will be last number
+
+    return row_vector
