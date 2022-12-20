@@ -5,29 +5,11 @@ if __package__ == "":
     # when imported from __main__
     import savegame
     import gamelogic
+    from gui_definitions import *
 else:
     # when imported from __init__
     from . import savegame, gamelogic
-
-COLOR = {
-    "background": "#FFFFFF",
-    "empty": "#AAAAAA",
-    "full": "#F0AB00",
-    "x-placeholder": "#000000",
-    "black": "#000000"
-}
-
-FONT_NAME = pg.font.get_default_font()
-try:
-    FONT_NAME_MONO = pg.font.match_font("notomono")
-except:
-    FONT_NAME_MONO = FONT_NAME
-
-
-BLOCK_SIZE = np.array([45., 45.])
-BLOCK_MARGIN = np.array([1., 1.])
-INITIAL_COORDS = [110., 210.]
-SCREEN_SIZE = [600, 700]
+    from .gui_definitions import *
 
 
 def run():
@@ -45,8 +27,7 @@ def run():
         "win": False,
         "mouse_button": None,
         "last_position": np.array([-1, -1]),
-        "game": game,
-        "screen": screen
+        "game": game
     }
 
     while event_data["running"]:
@@ -102,7 +83,7 @@ def get_events(data: dict):
 
 def handle_click(click: pg.event.Event, data: dict):
     pos = np.array(click.__dict__["pos"])
-    pos = (pos - INITIAL_COORDS) // BLOCK_SIZE
+    pos = (pos - GAME_INITIAL_COORDS) // BLOCK_SIZE
 
     # fixme... solves the game
     if pos[0] == pos[1] == -1:
@@ -128,7 +109,7 @@ def draw_game(screen: pg.Surface, game: savegame.SaveGame):
     assert len(dims) == 2, "Board has to be a 2D array."
     assert dims[0] <= 10 and dims[1] <= 10, "Board has to be 10 x 10 or smaller."
 
-    coords = list(INITIAL_COORDS)  # creates a copy
+    coords = list(GAME_INITIAL_COORDS)  # creates a copy
 
     for row, lengths in zip(game.guesses, game.y):
         lengths_coords = (coords[0], coords[1] + (0.4 * BLOCK_SIZE[1]))
@@ -146,15 +127,15 @@ def draw_game(screen: pg.Surface, game: savegame.SaveGame):
             pg.draw.rect(screen, color, (*(coords + BLOCK_MARGIN), *(BLOCK_SIZE - 2 * BLOCK_MARGIN)))
             coords[0] += BLOCK_SIZE[0]
 
-        coords[0] = INITIAL_COORDS[0]  # CR
+        coords[0] = GAME_INITIAL_COORDS[0]  # CR
         coords[1] += BLOCK_SIZE[1]  # LF
 
-    coords = list(INITIAL_COORDS)
+    coords = list(GAME_INITIAL_COORDS)
     coords = [coords[0] + 0.4 * BLOCK_SIZE[0], coords[1]]
     for lengths in game.x:
         draw_vector(np.array(coords), lengths, screen, True)
         coords[0] += BLOCK_SIZE[0]
-        coords[1] = list(INITIAL_COORDS)[1]
+        coords[1] = list(GAME_INITIAL_COORDS)[1]
 
 
 def draw_vector(coords: np.ndarray, vector: (list, bool), screen: pg.Surface, vertical: bool):
