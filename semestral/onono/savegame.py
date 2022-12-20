@@ -6,7 +6,7 @@ class SaveGame:
     """
     Stores the state of the game board, especially important when loading/saving the game.
     """
-    def __init__(self, dims: tuple = (5, 5)):
+    def __init__(self, dims: tuple = (10, 10)):
         self.board = np.zeros(dims, bool)
         self.guesses = np.zeros(dims, int)  # 0 => empty; 1 => X; 2 => full
         self.x = np.array([0])
@@ -18,19 +18,21 @@ class SaveGame:
         """
         Loads a text file in the `saves` directory and stores the data into the board.
         """
+        name += ".csv"
         path = Path(__file__).parent.parent
         path = (path / 'saves' / name).resolve()
         try:
             self.board = np.loadtxt(path, dtype=bool, delimiter=',')
             self.overwrite_lengths()
             return True
-        except FileNotFoundError:
+        except (FileNotFoundError, ValueError):
             return False
 
     def save_game(self, name: str):
         """
         Saves the data from the board into a text file in the `saves` directory.
         """
+        name += ".csv"
         path = Path(__file__).parent.parent
         path = (path / 'saves' / name).resolve()
 
