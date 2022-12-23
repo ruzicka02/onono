@@ -106,3 +106,12 @@ def vector_to_hints(vector: np.ndarray) -> list:
         row_vector.append(counter)  # will be last number
 
     return row_vector
+
+
+def get_savegames():
+    """
+    Opens the `saves` directory and returns the list of all save games.
+    """
+    path = Path(__file__).parent.parent
+    path = (path / 'saves').resolve().glob("*.csv")
+    return [x.stem for x in path if x.is_file()]

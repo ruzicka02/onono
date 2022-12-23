@@ -24,9 +24,10 @@ def run():
 
     event_data = {
         "running": True,
-        "buttons": ["Play", "Lorem", "Ipsum Dolor Sit Amet"],
+        "buttons": ["Play Now", "Load Game", "Info"],
         "button_clicked": None,  # stores number of selected button (0, 1, ..., n - 1)
         "button_hover": None,
+        "load_game": False,
         "screen": screen
     }
 
@@ -43,14 +44,16 @@ def run():
         text = font_h1.render("Onono!", True, COLOR["full"], COLOR["background"])
         center_shift = (SCREEN_SIZE[0] - text.get_width()) / 2
         screen.blit(text, (center_shift, 100))
-        text = font_h2.render("The Puzzle Game", True, COLOR["full"], COLOR["background"])
+
+        subtitle = "The Puzzle Game" if not event_data["load_game"] else "Load Game!"
+        text = font_h2.render(subtitle, True, COLOR["full"], COLOR["background"])
         center_shift = (SCREEN_SIZE[0] - text.get_width()) / 2
         screen.blit(text, (center_shift, 200))
 
         coords = MENU_INITIAL_COORDS + np.array(MENU_MARGIN)
-
+        menu_items = event_data["buttons"] if not event_data["load_game"] else savegame.get_savegames()
         i = 0
-        for item in event_data["buttons"]:
+        for item in menu_items:
             color = COLOR["full"] if i == event_data["button_hover"] else COLOR["black"]
             text = font.render(item, True, color, COLOR["background"])
             screen.blit(text, coords)
@@ -79,10 +82,14 @@ def register_mouse(data: dict, event: pg.event, click: bool):
     pos_item = pos // MENU_ITEM
     pos %= MENU_ITEM
 
-    if pos_item[1] not in range(len(data["buttons"])) or pos_item[0] != 0:
+    max_buttons = len(data["buttons"]) if not data["load_game"] else len(savegame.get_savegames())
+
+    # outside of menu items
+    if pos_item[1] not in range(max_buttons) or pos_item[0] != 0:
         data["button_hover"] = None
         return
 
+    # menu item margins... still appear as hover
     if pos[1] < MENU_MARGIN[1] or pos[1] > MENU_ITEM[1] - MENU_MARGIN[1]:
         return
 
@@ -92,15 +99,30 @@ def register_mouse(data: dict, event: pg.event, click: bool):
     data["button_hover"] = int(pos_item[1])
 
 
-
-
 def interpret_click(data: dict):
     selected = data["button_clicked"]
 
-    # play
     if selected is None:
         return
-    elif selected == 0:
+
+    if data["load_game"]:
+        pg.quit()
+        game = savegame.SaveGame()
+        if game.load_game(savegame.get_savegames()[selected]):
+            app.run(game)
+        else:
+            app.run()
+        exit(0)
+
+    # play
+    if selected == 0:
         pg.quit()
         app.run()
         exit(0)
+    # load game
+    elif selected == 1:
+        data["load_game"] = True
+        data["button_clicked"] = None
+    # info
+    elif selected == 2:
+        pass

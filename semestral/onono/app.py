@@ -12,8 +12,9 @@ else:
     from .gui_definitions import *
 
 
-def run():
-    game = prepare_game()
+def run(game: savegame.SaveGame = None):
+    if game is None:
+        game = prepare_game()
 
     pg.init()
     screen = pg.display.set_mode(SCREEN_SIZE)
