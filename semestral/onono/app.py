@@ -28,6 +28,7 @@ def run(game: savegame.SaveGame = None):
         "win": False,
         "mouse_button": None,
         "last_position": np.array([-1, -1]),
+        "show_timer": False,
         "game": game
     }
 
@@ -47,7 +48,7 @@ def run(game: savegame.SaveGame = None):
         screen.blit(header_text, (50, 20))
 
         draw_game(screen, game)
-        draw_timer(screen)
+        draw_timer(screen, event_data)
 
         # refresh screen
         pg.display.flip()
@@ -84,6 +85,13 @@ def get_events(data: dict):
 
 def handle_click(click: pg.event.Event, data: dict):
     pos = np.array(click.__dict__["pos"])
+
+    # timer toggle
+    if pos[0] > SCREEN_SIZE[0] - 200 and pos[1] < 50 and data["mouse_button"] == 1:
+        data["show_timer"] = not data["show_timer"]
+        data["mouse_button"] = None  # gets switched back immediately otherwise
+        return
+
     pos = (pos - GAME_INITIAL_COORDS) // BLOCK_SIZE
 
     # fixme... solves the game
@@ -154,13 +162,20 @@ def draw_vector(coords: np.ndarray, vector: (list, bool), screen: pg.Surface, ve
         screen.blit(num_surface, list(coords))
 
 
-def draw_timer(screen: pg.Surface):
-    font_mono = pg.font.Font(FONT_NAME_MONO, 50)
+def draw_timer(screen: pg.Surface, data: dict):
+    show = data["show_timer"]
 
-    time_sec = pg.time.get_ticks() // 1000
-    time_text = font_mono.render(f"{time_sec // 60:02d}:{time_sec % 60:02d}", 1, False)
-    time_pos = np.array([SCREEN_SIZE[0] - font_mono.size("00:00  ")[0], 10])
-    screen.blit(time_text, time_pos)
+    if show:
+        font = pg.font.Font(FONT_NAME_MONO, 50)
+        time_sec = pg.time.get_ticks() // 1000
+        text = font.render(f"{time_sec // 60:02d}:{time_sec % 60:02d}", True, COLOR["black"])
+        pos = np.array([SCREEN_SIZE[0] - font.size("00:00  ")[0], 10])
+    else:
+        font = pg.font.Font(FONT_NAME, 30)
+        text = font.render("Show timer", True, COLOR["empty"])
+        pos = np.array([SCREEN_SIZE[0] - font.size("Show timer____")[0], 30])
+
+    screen.blit(text, pos)
 
 
 def end_game(screen: pg.Surface):

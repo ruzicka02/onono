@@ -57,7 +57,4 @@ def validate_row(row: np.ndarray, hints: tuple):
     vector, complete = hints
 
     vector_guess = savegame.vector_to_hints(row - 1)
-    if np.array_equal(vector, vector_guess):
-        return True
-
-    return False
+    return np.array_equal(vector, vector_guess)
