@@ -44,6 +44,7 @@ Testovací soubory jsou obsaženy v adresáří `tests`. Některé z nich pracuj
 
 ## TODO
 - možnost uložit náhodně generovaný puzzle
-- generování puzzle z obrázku
+- generování puzzle z obrázku - implementace v menu
+- nastavení obtížnosti (generování puzzle/načítání obrázku)
 - "puzzle menu" - obtížnost, tabulka (potřeba adekvátně upravit savegame, "wrapper")
 - "Assisted mode" - solver???

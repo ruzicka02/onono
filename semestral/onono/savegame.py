@@ -1,6 +1,13 @@
 import numpy as np
 from pathlib import Path
 
+if __package__ == "":
+    # when imported from __main__
+    import image
+else:
+    # when imported from __init__
+    from . import image
+
 
 class SaveGame:
     """
@@ -27,6 +34,14 @@ class SaveGame:
             return True
         except (FileNotFoundError, ValueError):
             return False
+
+    def load_from_image(self, image_name: str, dims: tuple = (10, 10), percent_filled: float = 0.7) -> bool:
+        board = image.load_image(image_name, dims, percent_filled)
+        if board is not None:
+            self.board = board
+            self.overwrite_lengths()
+
+        return board is not None
 
     def save_game(self, name: str):
         """

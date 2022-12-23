@@ -181,8 +181,9 @@ def draw_timer(screen: pg.Surface, data: dict):
 def end_game(screen: pg.Surface):
     font = pg.font.Font(FONT_NAME, 75)
 
-    win_text = font.render("Winner!", 1, COLOR["full"], COLOR["background"])
-    screen.blit(win_text, (180, 300))
+    text = font.render("Winner!", 1, COLOR["full"], COLOR["background"])
+    center_shift = (SCREEN_SIZE[0] - text.get_width()) / 2
+    screen.blit(text, (center_shift, 100))
     pg.display.flip()
     pg.time.wait(2500)
     pg.quit()
