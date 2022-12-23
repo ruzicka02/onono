@@ -35,7 +35,7 @@ class SaveGame:
         except (FileNotFoundError, ValueError):
             return False
 
-    def load_from_image(self, image_name: str, dims: tuple = (10, 10), percent_filled: float = 0.7) -> bool:
+    def load_from_image(self, image_name: str, percent_filled: float = 0.7, dims: tuple = (10, 10)) -> bool:
         board = image.load_image(image_name, dims, percent_filled)
         if board is not None:
             self.board = board

@@ -11,7 +11,7 @@ def load_image(name: str, dims: tuple = (10, 10), percent_filled: float = 0.7):
     """
     name += ".png"
     path = Path(__file__).parent.parent
-    path = (path / 'saves/images' / name).resolve()
+    path = (path / 'saves' / 'images' / name).resolve()
     try:
         image = Image.open(path)
         image = ImageOps.grayscale(image)
@@ -30,6 +30,7 @@ def apply_threshold(image: np.ndarray, expected_filled: float = 0.7):
     """
     total_px = image.shape[0] * image.shape[1]
 
+    prev_threshold = 128
     threshold = 128
     closest_match = 1.
     while True:
@@ -42,10 +43,21 @@ def apply_threshold(image: np.ndarray, expected_filled: float = 0.7):
         else:
             break
 
-        if difference < 0:
-            threshold -= 1
-        else:
-            threshold += 1
+        next_threshold = threshold - 1 if difference < 0 else threshold + 1
+        if next_threshold == prev_threshold or next_threshold < 0 or next_threshold > 255:
+            break
+
+        prev_threshold = threshold
+        threshold = next_threshold
 
     # print(f"Threshold {threshold}, {filled * 100:.1f} % filled")
     return mask
+
+
+def get_images():
+    """
+    Opens the `saves/images` directory and returns the list of all PNG files.
+    """
+    path = Path(__file__).parent.parent
+    path = (path / 'saves' / 'images').resolve().glob("*.png")
+    return [x.stem for x in path if x.is_file()]

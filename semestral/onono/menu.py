@@ -5,10 +5,11 @@ if __package__ == "":
     # when imported from __main__
     import savegame
     import app
+    import image
     from gui_definitions import *
 else:
     # when imported from __init__
-    from . import savegame, app
+    from . import savegame, app, image
     from .gui_definitions import *
 
 GAME_INFO = ["Created by Simon Ruzicka @ FIT CTU, 2022",
@@ -26,15 +27,13 @@ def run():
     pg.font.init()
     font_h1 = pg.font.Font(FONT_NAME, 100)
     font_h2 = pg.font.Font(FONT_NAME, 50)
-    font = pg.font.Font(FONT_NAME, 25)
-    font_info = pg.font.Font(FONT_NAME, 20)
 
     event_data = {
         "running": True,
-        "buttons": ["Play Now", "Load Game", "Info", "Quit Game"],
+        "buttons": ["Play Now", "Load Game", "Load from Image", "Info", "Quit Game"],
         "button_clicked": None,  # stores number of selected button (0, 1, ..., n - 1)
         "button_hover": None,
-        "load_game": False,
+        "menu": "default",
         "info": False,
         "screen": screen
     }
@@ -53,37 +52,59 @@ def run():
         center_shift = (SCREEN_SIZE[0] - text.get_width()) / 2
         screen.blit(text, (center_shift, 100))
 
-        subtitle = "The Puzzle Game" if not event_data["load_game"] else "Load Game!"
+        subtitle = "The Puzzle Game" if event_data["menu"] == "default" else "Load Game!"
         text = font_h2.render(subtitle, True, COLOR["full"], COLOR["background"])
         center_shift = (SCREEN_SIZE[0] - text.get_width()) / 2
         screen.blit(text, (center_shift, 200))
 
         if event_data["info"]:
-            coords = np.array(MENU_INITIAL_COORDS)
-            for line in GAME_INFO:
-                print(line)
-                text = font_info.render(line, True, COLOR["black"], COLOR["background"])
-                screen.blit(text, coords)
-                coords[1] += MENU_ITEM[1]
-            pg.display.flip()
-            pg.time.wait(5000)  # 5 seconds
-            event_data["info"] = False
+            draw_info(screen, event_data)
             continue
 
-        coords = MENU_INITIAL_COORDS + np.array(MENU_MARGIN)
-        menu_items = event_data["buttons"] if not event_data["load_game"] else savegame.get_savegames()
-        i = 0
-        for item in menu_items:
-            color = COLOR["full"] if i == event_data["button_hover"] else COLOR["black"]
-            text = font.render(item, True, color, COLOR["background"])
-            screen.blit(text, coords)
-            coords[1] += MENU_ITEM[1]
-            i += 1
+        menu_items = get_menu_items(event_data)
+        draw_menu_items(menu_items, screen, event_data)
 
         # refresh screen
         pg.display.flip()
 
     pg.quit()
+
+
+def draw_info(screen, data: dict):
+    font = pg.font.Font(FONT_NAME, 20)
+
+    coords = np.array(MENU_INITIAL_COORDS)
+    for line in GAME_INFO:
+        text = font.render(line, True, COLOR["black"], COLOR["background"])
+        screen.blit(text, coords)
+        coords[1] += MENU_ITEM[1]
+    pg.display.flip()
+    pg.time.wait(5000)  # 5 seconds
+    data["info"] = False
+
+
+def draw_menu_items(items: list, screen, data: dict):
+    font = pg.font.Font(FONT_NAME, 25)
+
+    coords = MENU_INITIAL_COORDS + np.array(MENU_MARGIN)
+    i = 0
+    for item in items:
+        color = COLOR["full"] if i == data["button_hover"] else COLOR["black"]
+        text = font.render(item, True, color, COLOR["background"])
+        screen.blit(text, coords)
+        coords[1] += MENU_ITEM[1]
+        i += 1
+
+
+def get_menu_items(data: dict) -> list:
+    if data["menu"] == "default":
+        return data["buttons"]
+    elif data["menu"] == "load_save":
+        return savegame.get_savegames()
+    elif data["menu"] == "load_img":
+        return image.get_images()
+    else:
+        return []
 
 
 def get_events(data: dict):
@@ -102,7 +123,7 @@ def register_mouse(data: dict, event: pg.event, click: bool):
     pos_item = pos // MENU_ITEM
     pos %= MENU_ITEM
 
-    max_buttons = len(data["buttons"]) if not data["load_game"] else len(savegame.get_savegames())
+    max_buttons = len(get_menu_items(data))
 
     # outside of menu items
     if pos_item[1] not in range(max_buttons) or pos_item[0] != 0:
@@ -125,13 +146,8 @@ def interpret_click(data: dict):
     if selected is None:
         return
 
-    if data["load_game"]:
-        pg.quit()
-        game = savegame.SaveGame()
-        if game.load_game(savegame.get_savegames()[selected]):
-            app.run(game)
-        else:
-            app.run()
+    if data["menu"] != "default":
+        load_game(data, selected)
         exit(0)
 
     # play
@@ -141,13 +157,28 @@ def interpret_click(data: dict):
         exit(0)
     # load game
     elif selected == 1:
-        data["load_game"] = True
-    # info
+        data["menu"] = "load_save"
+    # load game from image
     elif selected == 2:
+        data["menu"] = "load_img"
+    # info
+    elif selected == 3:
         data["info"] = True
     # quit game
-    elif selected == 3:
+    elif selected == 4:
         pg.quit()
         exit(0)
 
     data["button_clicked"] = None
+
+
+def load_game(data: dict, selected: int):
+    load_image = data["menu"] == "load_img"
+    pg.quit()
+    game = savegame.SaveGame()
+    if load_image:
+        success = game.load_from_image(get_menu_items(data)[selected])
+        app.run(game) if success else app.run()
+    else:
+        success = game.load_game(get_menu_items(data)[selected])
+        app.run(game) if success else app.run()

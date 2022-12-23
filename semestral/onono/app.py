@@ -173,7 +173,7 @@ def draw_timer(screen: pg.Surface, data: dict):
     else:
         font = pg.font.Font(FONT_NAME, 30)
         text = font.render("Show timer", True, COLOR["empty"])
-        pos = np.array([SCREEN_SIZE[0] - font.size("Show timer____")[0], 30])
+        pos = np.array([SCREEN_SIZE[0] - font.size("Show timer___")[0], 30])
 
     screen.blit(text, pos)
 

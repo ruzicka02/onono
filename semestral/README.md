@@ -43,8 +43,9 @@ Proces instalace a spuštění:
 Testovací soubory jsou obsaženy v adresáří `tests`. Některé z nich pracují i s vlastními herními savy (mezní případy nesprávných vstupů), takové jsou v adresáři `saves\tests`. Testy je možné spustit pomocí příkazu `pytest`, spuštěného v domovském adresáří.
 
 ## TODO
-- možnost uložit náhodně generovaný puzzle
-- generování puzzle z obrázku - implementace v menu
-- nastavení obtížnosti (generování puzzle/načítání obrázku)
 - "puzzle menu" - obtížnost, tabulka (potřeba adekvátně upravit savegame, "wrapper")
+  - možnost uložit náhodně generovaný puzzle
+  - nastavení obtížnosti (generování puzzle/načítání obrázku)
+- testy
+- průvodní zpráva
 - "Assisted mode" - solver???
