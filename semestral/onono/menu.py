@@ -11,6 +11,12 @@ else:
     from . import savegame, app
     from .gui_definitions import *
 
+GAME_INFO = ["Created by Simon Ruzicka @ FIT CTU, 2022",
+             "",
+             "Game Guide:",
+             "Color the squares by using your mouse buttons",
+             "Use the hints on the left and top to solve puzzles"]
+
 
 def run():
     pg.init()
@@ -21,13 +27,15 @@ def run():
     font_h1 = pg.font.Font(FONT_NAME, 100)
     font_h2 = pg.font.Font(FONT_NAME, 50)
     font = pg.font.Font(FONT_NAME, 25)
+    font_info = pg.font.Font(FONT_NAME, 20)
 
     event_data = {
         "running": True,
-        "buttons": ["Play Now", "Load Game", "Info"],
+        "buttons": ["Play Now", "Load Game", "Info", "Quit Game"],
         "button_clicked": None,  # stores number of selected button (0, 1, ..., n - 1)
         "button_hover": None,
         "load_game": False,
+        "info": False,
         "screen": screen
     }
 
@@ -49,6 +57,18 @@ def run():
         text = font_h2.render(subtitle, True, COLOR["full"], COLOR["background"])
         center_shift = (SCREEN_SIZE[0] - text.get_width()) / 2
         screen.blit(text, (center_shift, 200))
+
+        if event_data["info"]:
+            coords = np.array(MENU_INITIAL_COORDS)
+            for line in GAME_INFO:
+                print(line)
+                text = font_info.render(line, True, COLOR["black"], COLOR["background"])
+                screen.blit(text, coords)
+                coords[1] += MENU_ITEM[1]
+            pg.display.flip()
+            pg.time.wait(5000)  # 5 seconds
+            event_data["info"] = False
+            continue
 
         coords = MENU_INITIAL_COORDS + np.array(MENU_MARGIN)
         menu_items = event_data["buttons"] if not event_data["load_game"] else savegame.get_savegames()
@@ -122,7 +142,12 @@ def interpret_click(data: dict):
     # load game
     elif selected == 1:
         data["load_game"] = True
-        data["button_clicked"] = None
     # info
     elif selected == 2:
-        pass
+        data["info"] = True
+    # quit game
+    elif selected == 3:
+        pg.quit()
+        exit(0)
+
+    data["button_clicked"] = None
