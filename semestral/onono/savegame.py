@@ -36,7 +36,12 @@ class SaveGame:
             return False
 
     def load_from_image(self, image_name: str, percent_filled: float = 0.7, dims: tuple = (10, 10)) -> bool:
+        """
+        Loads an image file in the `saves/images` directory, converts it using the `image` module
+        and stores the data into the board.
+        """
         board = image.load_image(image_name, dims, percent_filled)
+        # checking valid input
         if board is not None:
             self.board = board
             self.overwrite_lengths()
@@ -123,10 +128,10 @@ def vector_to_hints(vector: np.ndarray) -> list:
     return row_vector
 
 
-def get_savegames():
+def get_savegames(subdir: str = ""):
     """
     Opens the `saves` directory and returns the list of all save games.
     """
     path = Path(__file__).parent.parent
-    path = (path / 'saves').resolve().glob("*.csv")
+    path = (path / 'saves' / subdir).resolve().glob("*.csv")
     return [x.stem for x in path if x.is_file()]

@@ -24,7 +24,6 @@ def run(game: savegame.SaveGame = None):
     font = pg.font.Font(FONT_NAME, 50)
 
     event_data = {
-        "running": True,
         "win": False,
         "mouse_button": None,
         "last_position": np.array([-1, -1]),
@@ -32,7 +31,7 @@ def run(game: savegame.SaveGame = None):
         "game": game
     }
 
-    while event_data["running"]:
+    while True:
         # sets the game to 30 FPS... sleep for 33 ms
         pg.time.wait(33)
 
@@ -53,8 +52,6 @@ def run(game: savegame.SaveGame = None):
         # refresh screen
         pg.display.flip()
 
-    pg.quit()
-
 
 def prepare_game() -> savegame.SaveGame:
     """
@@ -69,7 +66,8 @@ def get_events(data: dict):
     mouse_event = None
     for event in pg.event.get():
         if event.type == pg.QUIT:
-            data["running"] = False
+            pg.quit()
+            exit(1)
         if event.type == pg.MOUSEBUTTONDOWN and event.__dict__["button"] in [1, 3]:
             data["mouse_button"] = event.__dict__["button"]
             mouse_event = event
@@ -179,6 +177,9 @@ def draw_timer(screen: pg.Surface, data: dict):
 
 
 def end_game(screen: pg.Surface):
+    """
+    Ends the game with a win. Is not started when game window is closed.
+    """
     font = pg.font.Font(FONT_NAME, 75)
 
     text = font.render("Winner!", 1, COLOR["full"], COLOR["background"])

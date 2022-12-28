@@ -29,7 +29,6 @@ def run():
     font_h2 = pg.font.Font(FONT_NAME, 50)
 
     event_data = {
-        "running": True,
         "buttons": ["Play Now", "Load Game", "Load from Image", "Info", "Quit Game"],
         "button_clicked": None,  # stores number of selected button (0, 1, ..., n - 1)
         "button_hover": None,
@@ -38,7 +37,7 @@ def run():
         "screen": screen
     }
 
-    while event_data["running"]:
+    while True:
         # sets the game to 30 FPS... sleep for 33 ms
         pg.time.wait(33)
 
@@ -66,8 +65,6 @@ def run():
 
         # refresh screen
         pg.display.flip()
-
-    pg.quit()
 
 
 def draw_info(screen, data: dict):
@@ -110,7 +107,8 @@ def get_menu_items(data: dict) -> list:
 def get_events(data: dict):
     for event in pg.event.get():
         if event.type == pg.QUIT:
-            data["running"] = False
+            pg.quit()
+            exit(1)
         if event.type == pg.MOUSEBUTTONDOWN and event.__dict__["button"] == 1:
             register_mouse(data, event, True)
         if event.type == pg.MOUSEMOTION:
@@ -146,15 +144,15 @@ def interpret_click(data: dict):
     if selected is None:
         return
 
+    # only non-default menu is when loading a game
     if data["menu"] != "default":
         load_game(data, selected)
-        exit(0)
+        run()  # go back to menu
 
-    # play
+    # play (random save)
     if selected == 0:
-        pg.quit()
-        app.run()
-        exit(0)
+        app.run()  # run the game
+        run()  # go back to menu
     # load game
     elif selected == 1:
         data["menu"] = "load_save"
@@ -173,8 +171,11 @@ def interpret_click(data: dict):
 
 
 def load_game(data: dict, selected: int):
+    """
+    Loads the game at given position in the list. Based on parameter *menu* in data dict, looks for an image
+    or a text file in the saves/ directory.
+    """
     load_image = data["menu"] == "load_img"
-    pg.quit()
     game = savegame.SaveGame()
     if load_image:
         success = game.load_from_image(get_menu_items(data)[selected])

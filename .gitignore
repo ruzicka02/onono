@@ -121,3 +121,5 @@ dmypy.json
 # semestral
 semestral/saves/*
 !semestral/saves/tests
+!semestral/saves/images
+!semestral/saves/Game01.csv
