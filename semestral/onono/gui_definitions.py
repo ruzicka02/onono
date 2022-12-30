@@ -14,6 +14,9 @@ FONT_NAME_MONO = pg.font.match_font("notomono")
 if FONT_NAME_MONO == '':  # fallback font
     FONT_NAME_MONO = FONT_NAME
 
+MENU_CAPTION = "Onono! The Puzzle Game - Menu"
+GAME_CAPTION = "Onono! The Puzzle Game"
+
 SCREEN_SIZE = [600, 700]
 
 MENU_INITIAL_COORDS = [50., 300.]

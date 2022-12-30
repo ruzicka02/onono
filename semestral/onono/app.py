@@ -12,13 +12,16 @@ else:
     from .gui_definitions import *
 
 
-def run(game: savegame.SaveGame = None):
+def run(screen: pg.Surface = None, game: savegame.SaveGame = None):
+    no_screen = screen is None
+    if no_screen:
+        pg.init()
+        screen = pg.display.set_mode(SCREEN_SIZE)
+
     if game is None:
         game = prepare_game()
 
-    pg.init()
-    screen = pg.display.set_mode(SCREEN_SIZE)
-    pg.display.set_caption("Onono! The Puzzle Game")
+    pg.display.set_caption(GAME_CAPTION)
 
     pg.font.init()
     font = pg.font.Font(FONT_NAME, 50)
@@ -28,7 +31,9 @@ def run(game: savegame.SaveGame = None):
         "mouse_button": None,
         "last_position": np.array([-1, -1]),
         "show_timer": False,
-        "game": game
+        "game": game,
+        "screen": screen,
+        "started_without_screen": no_screen  # screen that was created here will be shut down
     }
 
     while True:
@@ -39,15 +44,15 @@ def run(game: savegame.SaveGame = None):
 
         if gamelogic.validate_game(game):
             draw_game(screen, game)
-            end_game(screen)
+            end_game(event_data)
             return
 
         screen.fill(COLOR["background"])
-        header_text = font.render("Onono!", 1, COLOR["full"], COLOR["background"])
+        header_text = font.render("Onono!", True, COLOR["full"], COLOR["background"])
         screen.blit(header_text, (50, 20))
 
         draw_game(screen, game)
-        draw_timer(screen, event_data)
+        draw_timer(event_data)
 
         # refresh screen
         pg.display.flip()
@@ -160,7 +165,7 @@ def draw_vector(coords: np.ndarray, vector: (list, bool), screen: pg.Surface, ve
         screen.blit(num_surface, list(coords))
 
 
-def draw_timer(screen: pg.Surface, data: dict):
+def draw_timer(data: dict):
     show = data["show_timer"]
 
     if show:
@@ -173,18 +178,20 @@ def draw_timer(screen: pg.Surface, data: dict):
         text = font.render("Show timer", True, COLOR["empty"])
         pos = np.array([SCREEN_SIZE[0] - font.size("Show timer___")[0], 30])
 
-    screen.blit(text, pos)
+    data["screen"].blit(text, pos)
 
 
-def end_game(screen: pg.Surface):
+def end_game(data: dict):
     """
     Ends the game with a win. Is not started when game window is closed.
     """
     font = pg.font.Font(FONT_NAME, 75)
 
-    text = font.render("Winner!", 1, COLOR["full"], COLOR["background"])
+    text = font.render("Winner!", True, COLOR["full"], COLOR["background"])
     center_shift = (SCREEN_SIZE[0] - text.get_width()) / 2
-    screen.blit(text, (center_shift, 100))
+    data["screen"].blit(text, (center_shift, 100))
     pg.display.flip()
     pg.time.wait(2500)
-    pg.quit()
+
+    if data["started_without_screen"]:
+        pg.quit()

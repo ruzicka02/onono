@@ -19,11 +19,15 @@ GAME_INFO = ["Created by Simon Ruzicka @ FIT CTU, 2022",
              "Use the hints on the left and top to solve puzzles"]
 
 
-def run():
+def prepare_screen() -> pg.Surface:
     pg.init()
     screen = pg.display.set_mode(SCREEN_SIZE)
-    pg.display.set_caption("Onono! The Puzzle Game - Menu")
+    pg.display.set_caption(MENU_CAPTION)
 
+    return screen
+
+
+def run():
     pg.font.init()
     font_h1 = pg.font.Font(FONT_NAME, 100)
     font_h2 = pg.font.Font(FONT_NAME, 50)
@@ -34,7 +38,7 @@ def run():
         "button_hover": None,
         "menu": "default",
         "info": False,
-        "screen": screen
+        "screen": prepare_screen()
     }
 
     while True:
@@ -45,6 +49,7 @@ def run():
 
         interpret_click(event_data)
 
+        screen = event_data["screen"]
         screen.fill(COLOR["background"])
 
         text = font_h1.render("Onono!", True, COLOR["full"], COLOR["background"])
@@ -57,30 +62,30 @@ def run():
         screen.blit(text, (center_shift, 200))
 
         if event_data["info"]:
-            draw_info(screen, event_data)
+            draw_info(event_data)
             continue
 
         menu_items = get_menu_items(event_data)
-        draw_menu_items(menu_items, screen, event_data)
+        draw_menu_items(menu_items, event_data)
 
         # refresh screen
         pg.display.flip()
 
 
-def draw_info(screen, data: dict):
+def draw_info(data: dict):
     font = pg.font.Font(FONT_NAME, 20)
 
     coords = np.array(MENU_INITIAL_COORDS)
     for line in GAME_INFO:
         text = font.render(line, True, COLOR["black"], COLOR["background"])
-        screen.blit(text, coords)
+        data["screen"].blit(text, coords)
         coords[1] += MENU_ITEM[1]
     pg.display.flip()
     pg.time.wait(5000)  # 5 seconds
     data["info"] = False
 
 
-def draw_menu_items(items: list, screen, data: dict):
+def draw_menu_items(items: list, data: dict):
     font = pg.font.Font(FONT_NAME, 25)
 
     coords = MENU_INITIAL_COORDS + np.array(MENU_MARGIN)
@@ -88,7 +93,7 @@ def draw_menu_items(items: list, screen, data: dict):
     for item in items:
         color = COLOR["full"] if i == data["button_hover"] else COLOR["black"]
         text = font.render(item, True, color, COLOR["background"])
-        screen.blit(text, coords)
+        data["screen"].blit(text, coords)
         coords[1] += MENU_ITEM[1]
         i += 1
 
@@ -147,12 +152,15 @@ def interpret_click(data: dict):
     # only non-default menu is when loading a game
     if data["menu"] != "default":
         load_game(data, selected)
-        run()  # go back to menu
+        pg.display.set_caption(MENU_CAPTION)
+        selected = None
 
     # play (random save)
     if selected == 0:
-        app.run()  # run the game
-        run()  # go back to menu
+        app.run(data["screen"])  # run the game
+        pg.display.set_caption(MENU_CAPTION)
+        # save_prompt(data)
+
     # load game
     elif selected == 1:
         data["menu"] = "load_save"
@@ -179,7 +187,14 @@ def load_game(data: dict, selected: int):
     game = savegame.SaveGame()
     if load_image:
         success = game.load_from_image(get_menu_items(data)[selected])
-        app.run(game) if success else app.run()
+        app.run(data["screen"], game) if success else app.run(data["screen"])
     else:
         success = game.load_game(get_menu_items(data)[selected])
-        app.run(game) if success else app.run()
+        app.run(data["screen"], game) if success else app.run(data["screen"])
+
+    data["menu"] = "default"
+
+
+def save_prompt(data: dict):
+    draw_menu_items(["Save Game", "Don't Save"], data)
+
