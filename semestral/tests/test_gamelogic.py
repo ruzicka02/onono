@@ -57,6 +57,25 @@ def test_validate_empty():
     validate_asserts(save, False)
 
 
+def test_validate_diagonal():
+    """
+    Testing puzzle which has MANY solutions.
+    """
+    name = "tests/diagonal"
+    save = onono.savegame.SaveGame()
+    assert save.load_game(name)
+
+    save.get_solution(True)
+
+    for i in range(save.board.shape[0]):
+        validate_asserts(save, True)
+        save.guesses = np.roll(save.guesses, 1, axis=0)
+
+    for i in range(save.board.shape[1]):
+        validate_asserts(save, True)
+        save.guesses = np.roll(save.guesses, 1, axis=1)
+
+
 def validate_asserts(save: onono.savegame.SaveGame, valid: bool):
     """
     Used as a part of validation tests. Checks both functions `validate_game` and `validate_row`.
