@@ -1,5 +1,6 @@
 import numpy as np
 import pygame as pg
+from datetime import datetime
 
 if __package__ == "":
     # when imported from __main__
@@ -56,7 +57,7 @@ def run():
         center_shift = (SCREEN_SIZE[0] - text.get_width()) / 2
         screen.blit(text, (center_shift, 100))
 
-        subtitle = "The Puzzle Game" if event_data["menu"] == "default" else "Load Game!"
+        subtitle = get_subtitle(event_data)
         text = font_h2.render(subtitle, True, COLOR["full"], COLOR["background"])
         center_shift = (SCREEN_SIZE[0] - text.get_width()) / 2
         screen.blit(text, (center_shift, 200))
@@ -105,8 +106,19 @@ def get_menu_items(data: dict) -> list:
         return savegame.get_savegames()
     elif data["menu"] == "load_img":
         return image.get_images()
+    elif data["menu"] == "save_prompt":
+        return ["Save Game", "Don't Save"]
     else:
         return []
+
+
+def get_subtitle(data: dict) -> str:
+    if data["menu"] == "save_prompt":
+        return "Save Game!"
+    elif data["menu"] in ["load_save", "load_img"]:
+        return "Load Game!"
+    else:
+        return "The Puzzle Game"
 
 
 def get_events(data: dict):
@@ -150,16 +162,23 @@ def interpret_click(data: dict):
         return
 
     # only non-default menu is when loading a game
-    if data["menu"] != "default":
+    if data["menu"] in ["load_save", "load_img"]:
         load_game(data, selected)
         pg.display.set_caption(MENU_CAPTION)
         selected = None
 
+    if data["menu"] == "save_prompt":
+        if selected == 0:
+            stamp = datetime.now()
+            data["game"].save_game(str(stamp))
+        data["menu"] = "default"
+        selected = None
+
     # play (random save)
     if selected == 0:
-        app.run(data["screen"])  # run the game
+        data["game"] = app.run(data["screen"])  # run the game
         pg.display.set_caption(MENU_CAPTION)
-        # save_prompt(data)
+        data["menu"] = "save_prompt"
 
     # load game
     elif selected == 1:
@@ -193,8 +212,3 @@ def load_game(data: dict, selected: int):
         app.run(data["screen"], game) if success else app.run(data["screen"])
 
     data["menu"] = "default"
-
-
-def save_prompt(data: dict):
-    draw_menu_items(["Save Game", "Don't Save"], data)
-

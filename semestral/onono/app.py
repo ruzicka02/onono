@@ -1,5 +1,6 @@
 import numpy as np
 import pygame as pg
+import time
 
 if __package__ == "":
     # when imported from __main__
@@ -31,6 +32,7 @@ def run(screen: pg.Surface = None, game: savegame.SaveGame = None):
         "mouse_button": None,
         "last_position": np.array([-1, -1]),
         "show_timer": False,
+        "start": time.time(),
         "game": game,
         "screen": screen,
         "started_without_screen": no_screen  # screen that was created here will be shut down
@@ -45,7 +47,7 @@ def run(screen: pg.Surface = None, game: savegame.SaveGame = None):
         if gamelogic.validate_game(game):
             draw_game(screen, game)
             end_game(event_data)
-            return
+            return game  # used when saving generated game
 
         screen.fill(COLOR["background"])
         header_text = font.render("Onono!", True, COLOR["full"], COLOR["background"])
@@ -170,7 +172,7 @@ def draw_timer(data: dict):
 
     if show:
         font = pg.font.Font(FONT_NAME_MONO, 50)
-        time_sec = pg.time.get_ticks() // 1000
+        time_sec = int(time.time() - data["start"])
         text = font.render(f"{time_sec // 60:02d}:{time_sec % 60:02d}", True, COLOR["black"])
         pos = np.array([SCREEN_SIZE[0] - font.size("00:00  ")[0], 10])
     else:
