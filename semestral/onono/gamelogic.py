@@ -1,3 +1,7 @@
+"""
+Implements various functions for logic of the game.
+"""
+
 import numpy as np
 
 if __package__ == "":
@@ -9,6 +13,9 @@ else:
 
 
 def change_field(game: savegame.SaveGame, pos: np.ndarray, button: int):
+    """
+    Change value of one field in game board (guesses). Used when the field is clicked by player.
+    """
     if button not in [1, 3]:
         return
 
@@ -24,6 +31,11 @@ def change_field(game: savegame.SaveGame, pos: np.ndarray, button: int):
 
 
 def validate_game(game: savegame.SaveGame) -> bool:
+    """
+    Check if the game is finished. In case of an exact match, rows/columns are not checked at all.
+    Otherwise, function iterates over rows/columns and sets the data about their "completeness".
+    This feature is used when coloring the hints for completed rows.
+    """
     reference = game.get_solution(False)
     solution = game.guesses.copy()
 
@@ -53,8 +65,11 @@ def validate_game(game: savegame.SaveGame) -> bool:
     return is_correct
 
 
-def validate_row(row: np.ndarray, hints: tuple):
-    vector, complete = hints
+def validate_row(row: np.ndarray, hints: tuple) -> bool:
+    """
+    Check one row/column.
+    """
+    vector, _ = hints
 
     vector_guess = savegame.vector_to_hints(row - 1)
     return np.array_equal(vector, vector_guess)

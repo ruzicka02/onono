@@ -1,5 +1,10 @@
-import numpy as np
+"""
+Implements the SaveGame class to represent game data -
+for both load/save operations and gameplay itself.
+"""
+
 from pathlib import Path
+import numpy as np
 
 if __package__ == "":
     # when imported from __main__
@@ -35,7 +40,12 @@ class SaveGame:
         except (FileNotFoundError, ValueError):
             return False
 
-    def load_from_image(self, image_name: str, percent_filled: float = 0.7, dims: tuple = (10, 10)) -> bool:
+    def load_from_image(
+            self,
+            image_name: str,
+            percent_filled: float = 0.7,
+            dims: tuple = (10, 10)
+    ) -> bool:
         """
         Loads an image file in the `saves/images` directory, converts it using the `image` module
         and stores the data into the board.
@@ -84,8 +94,8 @@ class SaveGame:
 
     def randomize(self, prob: float = 0.5):
         """
-        Randomizes the board while keeping the same dimensions. Optional parameter of probability of any field
-        being True (between 0 and 1).
+        Randomizes the board while keeping the same dimensions.
+        Optional parameter of probability of any field being True (between 0 and 1).
         """
         assert 0 <= prob <= 1, "Probability parameter not in range <0, 1>"
         dims = self.board.shape
@@ -95,8 +105,9 @@ class SaveGame:
 
     def get_solution(self, overwrite: bool = False):
         """
-        Takes the correct solution and converts it into format of matrix of guesses. If the overwrite parameter
-        is set as `True`, the result overwrites the current guesses inside the object.
+        Takes the correct solution and converts it into format of matrix of guesses.
+        If the overwrite parameter is set as `True`, the result overwrites
+        the current guesses inside the object.
         """
         guesses = 1 + self.board
 

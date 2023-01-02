@@ -1,13 +1,17 @@
-import pathlib
+"""
+Module for loading images and turning them into game puzzles with variable threshold.
+"""
+
+from pathlib import Path
 
 import numpy as np
 from PIL import Image, ImageOps, UnidentifiedImageError
-from pathlib import Path
 
 
-def image_prepare(path: pathlib.Path, dims: tuple) -> np.ndarray:
+def image_prepare(path: Path, dims: tuple) -> np.ndarray:
     """
-
+    Opens the image and does various basic operations. Separated from `load_image()`
+    for testing purposes.
     """
     image = Image.open(path)
 
@@ -23,8 +27,8 @@ def image_prepare(path: pathlib.Path, dims: tuple) -> np.ndarray:
 
 def load_image(name: str, dims: tuple = (10, 10), percent_filled: float = 0.7):
     """
-    Loads a PNG image from the `saves/images` directory, performs various operations and returns it as an array.
-    In case something goes wrong, returns None.
+    Loads a PNG image from the `saves/images` directory, performs various operations
+    and returns it as an array. In case something goes wrong, returns None.
     """
     name += ".png"
     path = Path(__file__).parent.parent

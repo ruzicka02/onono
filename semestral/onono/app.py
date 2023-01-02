@@ -1,19 +1,33 @@
+"""
+GUI module for running the game itself. Function `run()` can be launched from menu
+or on its own, with an optional parameter of SaveGame object.
+"""
+import time
+import sys
+
 import numpy as np
 import pygame as pg
-import time
 
 if __package__ == "":
     # when imported from __main__
     import savegame
     import gamelogic
-    from gui_definitions import *
+    from gui_definitions import \
+        COLOR, FONT_NAME, FONT_NAME_MONO, GAME_CAPTION, SCREEN_SIZE, \
+        GAME_INITIAL_COORDS, BLOCK_SIZE, BLOCK_MARGIN
 else:
     # when imported from __init__
     from . import savegame, gamelogic
-    from .gui_definitions import *
+    from .gui_definitions import \
+        COLOR, FONT_NAME, FONT_NAME_MONO, GAME_CAPTION, SCREEN_SIZE, \
+        GAME_INITIAL_COORDS, BLOCK_SIZE, BLOCK_MARGIN
 
 
 def run(screen: pg.Surface = None, game: savegame.SaveGame = None):
+    """
+    Start the game window. Gets two parameters - pygame screen and SaveGame object. If they
+    are not given, they are newly created within this function (new game is randomly generated).
+    """
     no_screen = screen is None
     if no_screen:
         pg.init()
@@ -62,7 +76,7 @@ def run(screen: pg.Surface = None, game: savegame.SaveGame = None):
 
 def prepare_game() -> savegame.SaveGame:
     """
-    Helper function for showcase of board drawing.
+    Helper function for randomly generating a SaveGame.
     """
     s = savegame.SaveGame((10, 10))
     s.randomize(0.8)
@@ -70,11 +84,14 @@ def prepare_game() -> savegame.SaveGame:
 
 
 def get_events(data: dict):
+    """
+    Loads all pygame inputs.
+    """
     mouse_event = None
     for event in pg.event.get():
         if event.type == pg.QUIT:
             pg.quit()
-            exit(1)
+            sys.exit(1)
         if event.type == pg.MOUSEBUTTONDOWN and event.__dict__["button"] in [1, 3]:
             data["mouse_button"] = event.__dict__["button"]
             mouse_event = event
@@ -89,6 +106,10 @@ def get_events(data: dict):
 
 
 def handle_click(click: pg.event.Event, data: dict):
+    """
+    Handles the click event from `get_events()` and responds. Detects the various
+    clickable elements in the game window.
+    """
     pos = np.array(click.__dict__["pos"])
 
     # timer toggle
@@ -99,15 +120,14 @@ def handle_click(click: pg.event.Event, data: dict):
 
     pos = (pos - GAME_INITIAL_COORDS) // BLOCK_SIZE
 
-    # fixme... solves the game
+    # solves the game... remove for production
     if pos[0] == pos[1] == -1:
         data["game"].get_solution(True)
 
     if (pos == data["last_position"]).sum() == 2:
         return
-    else:
-        data["last_position"] = pos
 
+    data["last_position"] = pos
     button = data["mouse_button"]
 
     # debug data... logging clicks to terminal
@@ -119,6 +139,9 @@ def handle_click(click: pg.event.Event, data: dict):
 
 
 def draw_game(screen: pg.Surface, game: savegame.SaveGame):
+    """
+    Draws the game board tiles and the connected hints.
+    """
     dims = game.board.shape
     assert len(dims) == 2, "Board has to be a 2D array."
     assert dims[0] <= 10 and dims[1] <= 10, "Board has to be 10 x 10 or smaller."
@@ -153,6 +176,9 @@ def draw_game(screen: pg.Surface, game: savegame.SaveGame):
 
 
 def draw_vector(coords: np.ndarray, vector: (list, bool), screen: pg.Surface, vertical: bool):
+    """
+    Draws one vector of hints to the game screen.
+    """
     text, complete = vector
     font = pg.font.Font(FONT_NAME_MONO, 15)
     color = COLOR["full"] if complete else COLOR["black"]
@@ -168,6 +194,9 @@ def draw_vector(coords: np.ndarray, vector: (list, bool), screen: pg.Surface, ve
 
 
 def draw_timer(data: dict):
+    """
+    Draws the timer (or text "Show timer") to the game screen.
+    """
     show = data["show_timer"]
 
     if show:

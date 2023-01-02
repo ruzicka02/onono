@@ -1,17 +1,27 @@
+"""
+Game manu. By default, the first function to start the game is `run()` from this module.
+"""
+
+from datetime import datetime
+import sys
+
 import numpy as np
 import pygame as pg
-from datetime import datetime
 
 if __package__ == "":
     # when imported from __main__
     import savegame
     import app
     import image
-    from gui_definitions import *
+    from gui_definitions import \
+        COLOR, FONT_NAME, MENU_CAPTION, SCREEN_SIZE, \
+        MENU_INITIAL_COORDS, MENU_ITEM, MENU_MARGIN
 else:
     # when imported from __init__
     from . import savegame, app, image
-    from .gui_definitions import *
+    from .gui_definitions import \
+        COLOR, FONT_NAME, MENU_CAPTION, SCREEN_SIZE, \
+        MENU_INITIAL_COORDS, MENU_ITEM, MENU_MARGIN
 
 GAME_INFO = ["Created by Simon Ruzicka @ FIT CTU, 2022",
              "",
@@ -21,6 +31,9 @@ GAME_INFO = ["Created by Simon Ruzicka @ FIT CTU, 2022",
 
 
 def prepare_screen() -> pg.Surface:
+    """
+    Initiates the game screen and sets caption.
+    """
     pg.init()
     screen = pg.display.set_mode(SCREEN_SIZE)
     pg.display.set_caption(MENU_CAPTION)
@@ -29,6 +42,9 @@ def prepare_screen() -> pg.Surface:
 
 
 def run():
+    """
+    Main loop function for the game menu.
+    """
     pg.font.init()
     font_h1 = pg.font.Font(FONT_NAME, 100)
     font_h2 = pg.font.Font(FONT_NAME, 50)
@@ -48,7 +64,7 @@ def run():
 
         get_events(event_data)
 
-        interpret_click(event_data)
+        handle_click(event_data)
 
         screen = event_data["screen"]
         screen.fill(COLOR["background"])
@@ -74,6 +90,9 @@ def run():
 
 
 def draw_info(data: dict):
+    """
+    Draws the info screen.
+    """
     font = pg.font.Font(FONT_NAME, 20)
 
     coords = np.array(MENU_INITIAL_COORDS)
@@ -87,6 +106,9 @@ def draw_info(data: dict):
 
 
 def draw_menu_items(items: list, data: dict):
+    """
+    Draws the menu items given in a list.
+    """
     font = pg.font.Font(FONT_NAME, 25)
 
     coords = MENU_INITIAL_COORDS + np.array(MENU_MARGIN)
@@ -100,32 +122,45 @@ def draw_menu_items(items: list, data: dict):
 
 
 def get_menu_items(data: dict) -> list:
+    """
+    Loads the needed menu items based on `menu` parameter in the given dictionary.
+    """
     if data["menu"] == "default":
         return data["buttons"]
-    elif data["menu"] == "load_save":
+
+    if data["menu"] == "load_save":
         return savegame.get_savegames()
-    elif data["menu"] == "load_img":
+
+    if data["menu"] == "load_img":
         return image.get_images()
-    elif data["menu"] == "save_prompt":
+
+    if data["menu"] == "save_prompt":
         return ["Save Game", "Don't Save"]
-    else:
-        return []
+
+    return []
 
 
 def get_subtitle(data: dict) -> str:
+    """
+    Loads the needed game subtitle based on `menu` parameter in the given dictionary.
+    """
     if data["menu"] == "save_prompt":
         return "Save Game!"
-    elif data["menu"] in ["load_save", "load_img"]:
+
+    if data["menu"] in ["load_save", "load_img"]:
         return "Load Game!"
-    else:
-        return "The Puzzle Game"
+
+    return "The Puzzle Game"
 
 
 def get_events(data: dict):
+    """
+    Loads all pygame inputs.
+    """
     for event in pg.event.get():
         if event.type == pg.QUIT:
             pg.quit()
-            exit(1)
+            sys.exit(1)
         if event.type == pg.MOUSEBUTTONDOWN and event.__dict__["button"] == 1:
             register_mouse(data, event, True)
         if event.type == pg.MOUSEMOTION:
@@ -133,6 +168,9 @@ def get_events(data: dict):
 
 
 def register_mouse(data: dict, event: pg.event, click: bool):
+    """
+    Register mouse movements, activate hover effect and detect potential click.
+    """
     pos = np.array(event.__dict__["pos"])
     pos = (pos - MENU_INITIAL_COORDS)
     pos_item = pos // MENU_ITEM
@@ -155,7 +193,11 @@ def register_mouse(data: dict, event: pg.event, click: bool):
     data["button_hover"] = int(pos_item[1])
 
 
-def interpret_click(data: dict):
+def handle_click(data: dict):
+    """
+    Handles the click event from `get_events()` and responds. Detects the various
+    clickable elements in the game window.
+    """
     selected = data["button_clicked"]
 
     if selected is None:
@@ -192,7 +234,7 @@ def interpret_click(data: dict):
     # quit game
     elif selected == 4:
         pg.quit()
-        exit(0)
+        sys.exit(0)
 
     data["button_clicked"] = None
 
@@ -206,9 +248,15 @@ def load_game(data: dict, selected: int):
     game = savegame.SaveGame()
     if load_image:
         success = game.load_from_image(get_menu_items(data)[selected])
-        app.run(data["screen"], game) if success else app.run(data["screen"])
+        if success:
+            app.run(data["screen"], game)
+        else:
+            app.run(data["screen"])
     else:
         success = game.load_game(get_menu_items(data)[selected])
-        app.run(data["screen"], game) if success else app.run(data["screen"])
+        if success:
+            app.run(data["screen"], game)
+        else:
+            app.run(data["screen"])
 
     data["menu"] = "default"

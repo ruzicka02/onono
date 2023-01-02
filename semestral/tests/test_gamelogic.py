@@ -1,8 +1,4 @@
-import filecmp
-import os
-
 import numpy as np
-import pytest
 
 import onono.savegame
 import onono.gamelogic
