@@ -63,11 +63,11 @@ def test_validate_diagonal():
 
     save.get_solution(True)
 
-    for i in range(save.board.shape[0]):
+    for _ in range(save.board.shape[0]):
         validate_asserts(save, True)
         save.guesses = np.roll(save.guesses, 1, axis=0)
 
-    for i in range(save.board.shape[1]):
+    for _ in range(save.board.shape[1]):
         validate_asserts(save, True)
         save.guesses = np.roll(save.guesses, 1, axis=1)
 

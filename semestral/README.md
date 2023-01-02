@@ -8,7 +8,7 @@ Bližší informace o práci jako takové, jejím vývoji a možném rozšířen
 
 ## Závislosti a instalace
 
-Závislosti jsou popsány v souboru `requirements.txt`. Jediné velké balíčky, o které se práce opírá, jsou `pygame` (pro celé vykreslování GUI), `numpy` (pro práci s herními savy a víceméně veškeré operace s poli) a `PIL` (tj. *Python Imaging Library*; pro zpracování vstupního obrázku).
+Závislosti jsou popsány v souboru `requirements.txt`. Jediné velké externí balíčky, o které se práce opírá, jsou `pygame` (pro celé vykreslování GUI), `numpy` (pro práci s herními savy a víceméně veškeré operace s poli) a `PIL` (tj. *Python Imaging Library*; pro zpracování vstupního obrázku).
 
 Proces instalace a spuštění:
 - Ujistěte se, že se nacházíte v adresáří `semestral/`.
@@ -18,15 +18,11 @@ Proces instalace a spuštění:
 
 ## Testování
 
-Testovací soubory jsou obsaženy v adresáří `tests`. Některé z nich pracují i s vlastními herními savy (mezní případy nesprávných vstupů), takové jsou v adresáři `saves\tests`. Testy je možné spustit pomocí příkazu `pytest`, spuštěného v domovském adresáří.
+Testovací soubory jsou obsaženy v adresáří `tests`. Některé z nich pracují i s vlastními herními savy (mezní případy nesprávných vstupů), takové jsou v adresáři `saves\tests`, resp. `saves\images\tests`. V souboru `test_lint` se nachází automatická kontrola linterem `pylint`, všechny moduly by měly (s vyjímkou uvedených odůvodněných varování) procházet na plné skóre.
+
+Testy je možné spustit pomocí příkazu `pytest`, spuštěného v domovském adresáří.
 
 ## TODO
 - "puzzle menu" - obtížnost, tabulka (potřeba adekvátně upravit savegame, "wrapper")
   - možnost uložit náhodně generovaný puzzle
   - nastavení obtížnosti (generování puzzle/načítání obrázku)
-- testy
-- "Assisted mode" - solver???
-
-## Assisted Mode (TODO - REMOVE)
-
-Problém řešení Nonogramu již byl matematicky popsán jako NP-úplný, není znám žádný algoritmus který by jej řešil v polynomiálním čase. V semestrální práci jsem se původně snažil problému algoritmického řešení Nonogramu vyhnout (tj. přenechat na uživateli), bohužel to však není tak úplně možné. Hra musí kontrolovat uživatelovy tahy a posoudit, zda neprovádí neplatné tahy (ideálně co nejdříve). Základní verze programu (zn. Hard Mode) nechá hráče hádanku zcela vyplnit bez asistence, a až na konci ověří správnost. Tento problém je algoritmicky jednoduchý, obdobně jako např. u hry Sudoku, postačí pouhá iterace přes řádky a sloupce. Rozšířená verze (zn. Assisted Mode) pak bude každý hráčův tah ověřovat, a upozorní jej na případnou chybu již během hraní.

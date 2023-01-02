@@ -1,4 +1,3 @@
-from PIL import Image, ImageOps
 from pathlib import Path
 
 import numpy as np
@@ -18,7 +17,7 @@ def test_load_image(name, dims, valid):
     img = onono.image.load_image(name, dims)
 
     if valid:
-        assert type(img) == np.ndarray
+        assert isinstance(img, np.ndarray)
         assert img.ndim == 2
         assert img.shape == dims
 
@@ -46,8 +45,8 @@ def test_apply_threshold(name: str):
     path = (path / 'saves' / 'images' / name).resolve()
     img = onono.image.image_prepare(path, (10, 10))
 
-    assert type(onono.image.apply_threshold(img, 0.5, True)) == tuple
-    assert type(onono.image.apply_threshold(img, 0.5, False)) == np.ndarray
+    assert isinstance(onono.image.apply_threshold(img, 0.5, True), tuple)
+    assert isinstance(onono.image.apply_threshold(img, 0.5, False), np.ndarray)
 
     prev_threshold = 255  # maximum value
     prev_ratio = 0.
