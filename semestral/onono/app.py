@@ -13,13 +13,13 @@ if __package__ == "":
     import savegame
     import gamelogic
     from gui_definitions import \
-        COLOR, FONT_NAME, FONT_NAME_MONO, GAME_CAPTION, SCREEN_SIZE, \
+        COLOR, FONT_PATH, FONT_MONO_PATH, GAME_CAPTION, SCREEN_SIZE, \
         GAME_INITIAL_COORDS, BLOCK_SIZE, BLOCK_MARGIN
 else:
     # when imported from __init__
     from . import savegame, gamelogic
     from .gui_definitions import \
-        COLOR, FONT_NAME, FONT_NAME_MONO, GAME_CAPTION, SCREEN_SIZE, \
+        COLOR, FONT_PATH, FONT_MONO_PATH, GAME_CAPTION, SCREEN_SIZE, \
         GAME_INITIAL_COORDS, BLOCK_SIZE, BLOCK_MARGIN
 
 
@@ -39,7 +39,7 @@ def run(screen: pg.Surface = None, game: savegame.SaveGame = None):
     pg.display.set_caption(GAME_CAPTION)
 
     pg.font.init()
-    font = pg.font.Font(FONT_NAME, 50)
+    font = pg.font.Font(FONT_PATH, 50)
 
     event_data = {
         "win": False,
@@ -180,7 +180,7 @@ def draw_vector(coords: np.ndarray, vector: (list, bool), screen: pg.Surface, ve
     Draws one vector of hints to the game screen.
     """
     text, complete = vector
-    font = pg.font.Font(FONT_NAME_MONO, 15)
+    font = pg.font.Font(FONT_MONO_PATH, 15)
     color = COLOR["full"] if complete else COLOR["black"]
     delta = np.array([0., -font.get_linesize()]) if vertical else np.array([-font.size("10")[0], 0.])
 
@@ -200,12 +200,12 @@ def draw_timer(data: dict):
     show = data["show_timer"]
 
     if show:
-        font = pg.font.Font(FONT_NAME_MONO, 50)
+        font = pg.font.Font(FONT_MONO_PATH, 50)
         time_sec = int(time.time() - data["start"])
         text = font.render(f"{time_sec // 60:02d}:{time_sec % 60:02d}", True, COLOR["black"])
         pos = np.array([SCREEN_SIZE[0] - font.size("00:00  ")[0], 10])
     else:
-        font = pg.font.Font(FONT_NAME, 30)
+        font = pg.font.Font(FONT_PATH, 30)
         text = font.render("Show timer", True, COLOR["empty"])
         pos = np.array([SCREEN_SIZE[0] - font.size("Show timer___")[0], 30])
 
@@ -216,7 +216,7 @@ def end_game(data: dict):
     """
     Ends the game with a win. Is not started when game window is closed.
     """
-    font = pg.font.Font(FONT_NAME, 75)
+    font = pg.font.Font(FONT_PATH, 75)
 
     text = font.render("Winner!", True, COLOR["full"], COLOR["background"])
     center_shift = (SCREEN_SIZE[0] - text.get_width()) / 2

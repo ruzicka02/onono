@@ -14,13 +14,13 @@ if __package__ == "":
     import app
     import image
     from gui_definitions import \
-        COLOR, FONT_NAME, MENU_CAPTION, SCREEN_SIZE, \
+        COLOR, FONT_PATH, MENU_CAPTION, SCREEN_SIZE, \
         MENU_INITIAL_COORDS, MENU_ITEM, MENU_MARGIN
 else:
     # when imported from __init__
     from . import savegame, app, image
     from .gui_definitions import \
-        COLOR, FONT_NAME, MENU_CAPTION, SCREEN_SIZE, \
+        COLOR, FONT_PATH, MENU_CAPTION, SCREEN_SIZE, \
         MENU_INITIAL_COORDS, MENU_ITEM, MENU_MARGIN
 
 GAME_INFO = ["Created by Simon Ruzicka @ FIT CTU, 2022",
@@ -46,8 +46,8 @@ def run():
     Main loop function for the game menu.
     """
     pg.font.init()
-    font_h1 = pg.font.Font(FONT_NAME, 100)
-    font_h2 = pg.font.Font(FONT_NAME, 50)
+    font_h1 = pg.font.Font(FONT_PATH, 100)
+    font_h2 = pg.font.Font(FONT_PATH, 50)
 
     event_data = {
         "buttons": ["Play Now", "Load Game", "Load from Image", "Info", "Quit Game"],
@@ -93,7 +93,7 @@ def draw_info(data: dict):
     """
     Draws the info screen.
     """
-    font = pg.font.Font(FONT_NAME, 20)
+    font = pg.font.Font(FONT_PATH, 20)
 
     coords = np.array(MENU_INITIAL_COORDS)
     for line in GAME_INFO:
@@ -109,7 +109,7 @@ def draw_menu_items(items: list, data: dict):
     """
     Draws the menu items given in a list.
     """
-    font = pg.font.Font(FONT_NAME, 25)
+    font = pg.font.Font(FONT_PATH, 25)
 
     coords = MENU_INITIAL_COORDS + np.array(MENU_MARGIN)
     i = 0

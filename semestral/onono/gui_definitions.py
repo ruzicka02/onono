@@ -1,5 +1,10 @@
+"""
+Definitions for various GUI elements to be used in other game modules.
+"""
+
+from pathlib import Path
+
 import numpy as np
-import pygame as pg
 
 COLOR = {
     "background": "#FFFFFF",
@@ -9,10 +14,11 @@ COLOR = {
     "black": "#000000"
 }
 
-FONT_NAME = pg.font.get_default_font()
-FONT_NAME_MONO = pg.font.match_font("notomono")
-if FONT_NAME_MONO == '':  # fallback font
-    FONT_NAME_MONO = FONT_NAME
+# Both fonts are available with an open source licence.
+# Comic Neue Regular http://comicneue.com/
+# Noto Mono Regular https://fonts.adobe.com/fonts/noto-mono#fonts-section
+FONT_PATH = (Path(__file__).parent.parent / "data" / "fonts" / "ComicNeue-Regular.ttf").resolve()
+FONT_MONO_PATH = (Path(__file__).parent.parent / "data" / "fonts" / "NotoMono-Regular.ttf").resolve()
 
 MENU_CAPTION = "Onono! The Puzzle Game - Menu"
 GAME_CAPTION = "Onono! The Puzzle Game"
