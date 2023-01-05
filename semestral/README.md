@@ -8,7 +8,7 @@ Bližší informace o práci jako takové, jejím vývoji a možném rozšířen
 
 ## Závislosti a instalace
 
-Závislosti jsou popsány v souboru `requirements.txt`. Jediné velké externí balíčky, o které se práce opírá, jsou `pygame` (pro celé vykreslování GUI), `numpy` (pro práci s herními savy a víceméně veškeré operace s poli) a `PIL` (tj. *Python Imaging Library*; pro zpracování vstupního obrázku). Pro testování jsou dále využity balíčky `pytest` a `pylint`.
+Závislosti jsou popsány v souboru `requirements.txt`. Jediné velké externí balíčky, o které se práce opírá, jsou `pygame` (pro celé vykreslování GUI), `numpy` (pro práci s herními savy a víceméně veškeré operace s poli) a `PIL` (tj. *Python Imaging Library*; pro zpracování vstupního obrázku). Pro testování jsou dále využity balíčky `pytest`, `pylint` a `pyautogui`.
 
 Proces instalace a spuštění:
 - Ujistěte se, že se nacházíte v adresáří `semestral/`.

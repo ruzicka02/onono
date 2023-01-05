@@ -3,3 +3,4 @@ pygame
 pillow
 pytest
 pylint
+pyautogui
