@@ -54,6 +54,7 @@ class SaveGame:
         # checking valid input
         if board is not None:
             self.board = board
+            self.guesses = np.zeros(board.shape, int)
             self.overwrite_lengths()
 
         return board is not None

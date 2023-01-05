@@ -53,3 +53,22 @@ def test_randomize(prob, ratio_min, ratio_max):
 
 def test_get_savegames():
     assert len(onono.savegame.get_savegames("tests")) >= 4  # 4 currently used, more can be added later
+
+
+@pytest.mark.parametrize('name, dims, valid',
+                         [("lenna", (10, 10), True),
+                          ("lenny", (10, 10), True),
+                          ("lenna", (600, 600), False),
+                          ("lenny", (600, 600), True),
+                          ("tests/invalid1", (10, 10), False),
+                          ("tests/miluju_progtest", (10, 10), False)])
+def test_image_to_savegame(name, dims, valid):
+    save = onono.savegame.SaveGame()
+
+    assert save.load_from_image(name, dims=dims) == valid
+
+    if valid:
+        assert save.board.shape == save.guesses.shape
+        assert save.board.ndim == 2
+        x, y = save.board.shape
+        assert x == len(save.x) and y == len(save.y)
