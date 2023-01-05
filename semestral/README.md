@@ -4,11 +4,11 @@ Semestrální práce implementuje známou *puzzle* hru [Nonogram](https://en.wik
 
 Jedním z hlavních rozšíření této hry je možnost nahrát libovolný obrázek formátu PNG a nechat jej převést na samotnou hádanku. To umožní ve hře rychlé a jednoduché vytváření hádanek a velkou míru znovuhratelnosti.
 
-Bližší informace o práci jako takové, jejím vývoji a možném rozšíření se nachází v souboru `report.pdf`.
+Bližší informace o práci jako takové, jejím vývoji a možném rozšíření se nachází tzv. *reportu* v souboru `ruzicsi1.pdf`.
 
 ## Závislosti a instalace
 
-Závislosti jsou popsány v souboru `requirements.txt`. Jediné velké externí balíčky, o které se práce opírá, jsou `pygame` (pro celé vykreslování GUI), `numpy` (pro práci s herními savy a víceméně veškeré operace s poli) a `PIL` (tj. *Python Imaging Library*; pro zpracování vstupního obrázku).
+Závislosti jsou popsány v souboru `requirements.txt`. Jediné velké externí balíčky, o které se práce opírá, jsou `pygame` (pro celé vykreslování GUI), `numpy` (pro práci s herními savy a víceméně veškeré operace s poli) a `PIL` (tj. *Python Imaging Library*; pro zpracování vstupního obrázku). Pro testování jsou dále využity balíčky `pytest` a `pylint`.
 
 Proces instalace a spuštění:
 - Ujistěte se, že se nacházíte v adresáří `semestral/`.
@@ -18,11 +18,6 @@ Proces instalace a spuštění:
 
 ## Testování
 
-Testovací soubory jsou obsaženy v adresáří `tests`. Některé z nich pracují i s vlastními herními savy (mezní případy nesprávných vstupů), takové jsou v adresáři `saves\tests`, resp. `saves\images\tests`. V souboru `test_lint` se nachází automatická kontrola linterem `pylint`, všechny moduly by měly (s vyjímkou uvedených odůvodněných varování) procházet na plné skóre.
+Testovací soubory jsou obsaženy v adresáří `tests`. Některé z nich pracují i s vlastními herními savy (mezní případy nesprávných vstupů), takové jsou v adresáři `saves\tests`, resp. `saves\images\tests`. V souboru `test_lint` se nachází automatická kontrola linterem `pylint`, všechny moduly by měly (s vyjímkou uvedených odůvodněných varování) procházet na plné skóre, což znamená že zdrojový kód semestrální práce je v souladu s PEP 8.
 
 Testy je možné spustit pomocí příkazu `pytest`, spuštěného v domovském adresáří.
-
-## TODO
-- "puzzle menu" - obtížnost, tabulka (potřeba adekvátně upravit savegame, "wrapper")
-  - možnost uložit náhodně generovaný puzzle
-  - nastavení obtížnosti (generování puzzle/načítání obrázku)
