@@ -9,6 +9,9 @@ can also be generated completely randomly.
 
 Closer information about the project itself, algorithms used and possible extensions can be found in the attached `report.pdf` file.
 
+![](./data/menu.png)
+![](./data/game.png)
+
 ## Download
 
 [DOWNLOAD LINK - ZIP file](https://github.com/ruzicka02/onono/archive/refs/heads/game.zip)
